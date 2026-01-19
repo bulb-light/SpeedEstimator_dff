@@ -48,5 +48,5 @@
 .vscode/ipch
 
 # diagrams
-.drawio
-.drawio.bkp
+*.drawio
+*.drawio.bkp
