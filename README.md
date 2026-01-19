@@ -143,29 +143,28 @@ Refer to the following diagram for the wiring connections:
 The SpeedEstimator library calculates motor speed in RPM using encoder pulse data. The following equations outline the mathematical process:
 
 1. **Angular Velocity Calculation**:
-   \[
-   \omega = \frac{\Delta N}{\Delta t} \cdot \frac{2\pi}{PPR}
-   \]
+
+   $$\omega = \frac{\Delta N}{\Delta t} \cdot \frac{2\pi}{PPR}$$
+   
    where:
-   - \( \Delta N \): Change in encoder pulse count
-   - \( \Delta t \): Time interval between readings
-   - \( PPR \): Pulses per revolution of the encoder
+   - $\Delta N$: Change in encoder pulse count
+   - $\Delta t$: Time interval between readings
+   - $PPR$: Pulses per revolution of the encoder
 
-2. **Speed in RPM**:
-   \[
-   \text{Speed (RPM)} = \omega \cdot \frac{60}{2\pi} \cdot \frac{1}{\text{Gear Ratio}}
-   \]
+3. **Speed in RPM**:
 
-3. **Filtering**:
+   $$\text{Speed (RPM)} = \omega \cdot \frac{60}{2\pi} \cdot \frac{1}{\text{Gear Ratio}}$$
+
+4. **Filtering**:
    The library applies a first-order Butterworth filter to smooth the speed estimation:
-   \[
-   S_{filtered} = a \cdot S_{filtered,prev} + b \cdot S_{current} + c \cdot S_{prev}
-   \]
+   
+   $$S_{filtered} = a \cdot S_{filtered,prev} + b \cdot S_{current} + c \cdot S_{prev}$$
+   
    where:
-   - \( a, b, c \): Filter coefficients
-   - \( S_{filtered,prev} \): Previous filtered speed
-   - \( S_{current} \): Current calculated speed
-   - \( S_{prev} \): Previous calculated speed
+   - $a, b, c$: Filter coefficients
+   - $S_{filtered,prev}$: Previous filtered speed
+   - $S_{current}$: Current calculated speed
+   - $S_{prev}$: Previous calculated speed
 
 ### Block Diagram
 
