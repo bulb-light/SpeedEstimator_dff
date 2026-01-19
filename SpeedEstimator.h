@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 David Chirme Sisa ([dff-laoise](https://github.com/bulb-light)) 
+// SPDX-License-Identifier: MIT
+// For full license text, see the LICENSE file in the repository root or https://opensource.org/licenses/MIT
+
 /**
  * @file SpeedEstimator.h
  * @brief Library for calculating motor speed using encoder pulse data.
