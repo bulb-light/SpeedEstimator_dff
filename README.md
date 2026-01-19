@@ -118,13 +118,17 @@ void readEncoderPulses() {
 
 The result of the example is shown in the following figure (the blue line represents the variable speed in RPM):
 
-<img src="images/speed_reading_serial_analyzer.png" width="500" alt="Speed reading result">
+<p align="center">
+    <img src="images/speed_reading_serial_analyzer.png" width="500" alt="Speed reading result">
+</p>
 
 ### Diagram
 
 Refer to the following diagram for the wiring connections:
 
-<img src="images/speed_reading_connections.svg" width="500" alt="Speed Reading Connections" />
+<p align="center">
+<img src="images/speed_reading_connections.jpg" width="600" alt="Speed Reading Connections" />
+</p>
 
 ### Note
 
@@ -170,8 +174,9 @@ The SpeedEstimator library calculates motor speed in RPM using encoder pulse dat
 
 Below is a simple block diagram representing the speed estimation and filtering process:
 
-
-<img src="images/speed_estimation_logic.svg" width="500" alt="Speed Reading Connections" />
+<p align="center">
+<img src="images/speed_estimation_logic.jpg" width="700" alt="Speed Reading Connections" />
+</p>
 
 This process ensures accurate and smooth speed estimation for motor control applications.
 
