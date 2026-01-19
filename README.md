@@ -2,7 +2,9 @@
 
 ## Overview
 
-The SpeedEstimator library provides a simple and efficient way to calculate motor speed in RPM using encoder pulse data. It is designed to be independent of the data source for position readings, making it versatile for various motor control applications.
+The SpeedEstimator library provides a simple way to calculate motor speed in RPM using encoder pulse data. It is designed to be independent of the data source for position readings, making it versatile for various motor control applications.
+
+Experimental library. Minimal tested, so usage remarks and comments are welcome.
 
 ## Features
 
