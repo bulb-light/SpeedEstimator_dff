@@ -55,11 +55,13 @@ Below is an example of using the SpeedEstimator ([SpeedReading.cpp](examples/spe
 #include <SpeedEstimator.h>
 
 // Motor control pins
+// Modify these pin definitions as per your wiring
 #define IN1 8
 #define IN2 7
 #define ENA 10
 
-// Encoder pins
+// NOTE: The following steps are mandatory to use the SpeedEstimator class!
+// Encoder pins (change as needed)
 #define ENCA 3
 #define ENCB 2
 
@@ -67,6 +69,9 @@ Below is an example of using the SpeedEstimator ([SpeedReading.cpp](examples/spe
 float ppr = 22.0; // Pulses per revolution
 float gearRatio = 9.3; // Gear ratio
 SpeedEstimator speedEstimator(ppr, gearRatio);
+
+// NOTE: These steps are mandatory to use the SpeedEstimator class!
+// Implement your own method to read encoder pulses. This is just a simplified example.
 
 // Global variables: Encoder counter
 volatile int pos_i = 0;
@@ -88,33 +93,39 @@ void setup() {
     digitalWrite(IN2, LOW);
     analogWrite(ENA, 0); // Set speed (0-255)
 
-    // Setting up encoder interrupts
+    // Setting up encoder interrupts (example for Arduino Uno or Nano (using pin 2 and 3) with a simple encoder)
     attachInterrupt(digitalPinToInterrupt(ENCA), readEncoderPulses, RISING);
     attachInterrupt(digitalPinToInterrupt(ENCB), readEncoderPulses, RISING);
 }
 
 void loop() {
+    // Vary speed based on the elapsed time for demonstration
     long elapsed = millis();
     int speedValue = (elapsed / 10) % 256; // Speed value between 0-255
     analogWrite(ENA, speedValue);
 
+    // Read the position in an atomic block to avoid inconsistency due to interrupts
     int currentPulses;
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
         currentPulses = pos_i;
     }
-
+    // Estimate speed
     float speed = speedEstimator.estimateSpeed(currentPulses);
 
-    Serial.print("Motor Speed: ");
+    // Serial.print("Motor Speed: ");
     Serial.print(speed);
     Serial.print(" ");
     Serial.println(0);
+    // Serial.println(" RPM");
 
-    delay(10);
+    delay(10); // Simulate periodic updates
 }
 
-void readEncoderPulses() {
-    pos_i++;
+void readEncoderPulses()
+{
+  // Just a simple counter increment example
+  // In a real scenario, you would read the encoder pins and determine direction
+  pos_i++;
 }
 ```
 
