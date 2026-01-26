@@ -32,7 +32,7 @@
  */
 class SpeedEstimator {
     private:
-        long mPrevTime; ///< Previous timestamp in microseconds.
+        unsigned long mPrevTime; ///< Previous timestamp in microseconds.
         int mPrevNumPulses; ///< Previous number of pulses.
         float mSpeedFilt; ///< Filtered velocity.
         float mSpeedPrev; ///< Previous velocity.

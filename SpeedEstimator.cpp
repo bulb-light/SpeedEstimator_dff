@@ -13,15 +13,21 @@ SpeedEstimator::SpeedEstimator(float ppr, float gearRatio)
     : mPrevTime(0), mPrevNumPulses(0), mSpeedFilt(0), mSpeedPrev(0), mPpr(ppr), mGearRatio(gearRatio) {}
 
 float SpeedEstimator::estimateSpeed(int pulsesCount) {
-    long currTime = micros();
-    float deltaTime = ((float)(currTime - mPrevTime)) / 1.0e6;
+    unsigned long currTime = micros();
+    // Handle micros() overflow: unsigned arithmetic automatically wraps correctly
+    unsigned long deltaTimeMicros = currTime - mPrevTime;
+    float deltaTime = ((float)deltaTimeMicros) / 1.0e6;
 
     if (deltaTime <= 0) {
         // Avoid division by zero or negative time intervals
         return mSpeedFilt;
     }
 
-    float velocity = ((float)(pulsesCount - mPrevNumPulses)) / deltaTime;
+    // Handle pulse counter overflow by calculating the signed difference
+    // If pulsesCount wrapped around, this correctly computes the difference
+    int pulseDiff = pulsesCount - mPrevNumPulses;
+    float velocity = ((float)pulseDiff) / deltaTime;
+    
     mPrevNumPulses = pulsesCount;
     mPrevTime = currTime;
 
