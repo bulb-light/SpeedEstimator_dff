@@ -70,11 +70,19 @@ float ppr = 22.0; // Pulses per revolution
 float gearRatio = 9.3; // Gear ratio
 SpeedEstimator speedEstimator(ppr, gearRatio);
 
+// globals speed measurement and control variables
+float speedRPM = 0.0; // current velocity
+
+// timer control
+// using unsigned long for millis() compatibility and overflow handling
+unsigned long prevMillisSpeed = 0;
+unsigned long interval = 10; // 10ms interval
+
 // NOTE: These steps are mandatory to use the SpeedEstimator class!
 // Implement your own method to read encoder pulses. This is just a simplified example.
 
 // Global variables: Encoder counter
-volatile int pos_i = 0;
+volatile long pos_i = 0;
 
 // Method to read encoder pulses
 void readEncoderPulses();
@@ -100,25 +108,26 @@ void setup() {
 
 void loop() {
     // Vary speed based on the elapsed time for demonstration
-    long elapsed = millis();
-    int speedValue = (elapsed / 10) % 256; // Speed value between 0-255
+    unsigned long elapsed = millis();
+    unsigned int speedValue = (elapsed / 10) % 256; // Speed value between 0-255
     analogWrite(ENA, speedValue);
 
     // Read the position in an atomic block to avoid inconsistency due to interrupts
-    int currentPulses;
+    long currentPulses;
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
         currentPulses = pos_i;
     }
-    // Estimate speed
-    float speed = speedEstimator.estimateSpeed(currentPulses);
+    // Estimate speed at defined time interval (10ms)
+    if ((millis() - prevMillisSpeed) > interval) {
+        speedRPM = speedEstimator.estimateSpeed(currentPulses);
+        prevMillisSpeed = millis();
 
-    // Serial.print("Motor Speed: ");
-    Serial.print(speed);
-    Serial.print(" ");
-    Serial.println(0);
-    // Serial.println(" RPM");
-
-    delay(10); // Simulate periodic updates
+        // Serial.print("Motor Speed: ");
+        Serial.print(speedRPM);
+        Serial.print(" ");
+        Serial.println(0);
+        // Serial.println(" RPM");
+    }
 }
 
 void readEncoderPulses()

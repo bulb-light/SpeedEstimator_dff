@@ -13,10 +13,11 @@
  * This implementation assumes that estimateSpeed(int pulsesCount) is called periodically.
  */
 
-#ifndef __SPEEDESTIMATOR_H__
-#define __SPEEDESTIMATOR_H__
+#ifndef DFF_SPEEDESTIMATOR_H
+#define DFF_SPEEDESTIMATOR_H
 
-#include <Arduino.h>
+// NOTE: uncomment the following line if you need to use Arduino-specific types or functions.
+// #include <Arduino.h>
 
 /**
  * @class SpeedEstimator
@@ -33,7 +34,7 @@
 class SpeedEstimator {
     private:
         unsigned long mPrevTime; ///< Previous timestamp in microseconds.
-        int mPrevNumPulses; ///< Previous number of pulses.
+        long mPrevNumPulses; ///< Previous number of pulses.
         float mSpeedFilt; ///< Filtered velocity.
         float mSpeedPrev; ///< Previous velocity.
 
@@ -53,7 +54,7 @@ class SpeedEstimator {
          * @param pulsesCount The number of pulses counted by the encoder.
          * @return The calculated speed in RPM.
          */
-        float estimateSpeed(int pulsesCount);
+        float estimateSpeed(long pulsesCount);
 
         /**
          * @brief Reset the internal state of the estimator.

@@ -8,11 +8,12 @@
  */
 
 #include "SpeedEstimator.h"
+#include <Arduino.h> // Include Arduino.h for micros() and other Arduino-specific functions
 
 SpeedEstimator::SpeedEstimator(float ppr, float gearRatio)
     : mPrevTime(0), mPrevNumPulses(0), mSpeedFilt(0), mSpeedPrev(0), mPpr(ppr), mGearRatio(gearRatio) {}
 
-float SpeedEstimator::estimateSpeed(int pulsesCount) {
+float SpeedEstimator::estimateSpeed(long pulsesCount) {
     unsigned long currTime = micros();
     // Handle micros() overflow: unsigned arithmetic automatically wraps correctly
     unsigned long deltaTimeMicros = currTime - mPrevTime;
@@ -25,7 +26,7 @@ float SpeedEstimator::estimateSpeed(int pulsesCount) {
 
     // Handle pulse counter overflow by calculating the signed difference
     // If pulsesCount wrapped around, this correctly computes the difference
-    int pulseDiff = pulsesCount - mPrevNumPulses;
+    long pulseDiff = pulsesCount - mPrevNumPulses;
     float velocity = ((float)pulseDiff) / deltaTime;
     
     mPrevNumPulses = pulsesCount;
