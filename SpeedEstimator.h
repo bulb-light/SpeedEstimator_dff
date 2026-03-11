@@ -50,6 +50,11 @@ class SpeedEstimator {
         SpeedEstimator(float ppr, float gearRatio);
 
         /**
+         * @brief Destructor for SpeedEstimator.
+         */
+        ~SpeedEstimator();
+
+        /**
          * @brief Calculate the speed of the motor in RPM.
          * @param pulsesCount The number of pulses counted by the encoder.
          * @return The calculated speed in RPM.

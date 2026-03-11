@@ -13,6 +13,10 @@
 SpeedEstimator::SpeedEstimator(float ppr, float gearRatio)
     : mPrevTime(0), mPrevNumPulses(0), mSpeedFilt(0), mSpeedPrev(0), mPpr(ppr), mGearRatio(gearRatio) {}
 
+SpeedEstimator::~SpeedEstimator()
+{
+}
+
 float SpeedEstimator::estimateSpeed(long pulsesCount) {
     unsigned long currTime = micros();
     // Handle micros() overflow: unsigned arithmetic automatically wraps correctly
