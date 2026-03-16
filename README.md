@@ -1,8 +1,6 @@
 # SpeedEstimator Library for Arduino and ESP32
 
-## Overview
-
-The SpeedEstimator library provides a simple way to calculate motor speed in RPM using encoder pulse data. It is designed to be independent of the data source for position readings, making it versatile for various motor control applications.
+The `SpeedEstimator_dff` library provides a simple way to estimate motor speed in RPM from encoder pulses. It is independent of the position data source, making it compatible with different encoder types.
 
 Experimental library. Minimal tested, so usage remarks and comments are welcome.
 
@@ -47,7 +45,9 @@ Resets the internal state of the speed estimator.
 
 ## Example Usage
 
-Below is an example of using the SpeedEstimator ([SpeedReading.cpp](examples/speedReading.cpp)) library to calculate motor speed. This example demonstrates motor control and speed estimation using encoder pulses:
+### Unfiltered Speed Estimation
+
+Below is an example of using the `SpeedEstimator_dff` library ([SpeedReading.cpp](examples/speedReading.cpp)) to calculate motor speed. This example demonstrates motor control and speed estimation using encoder pulses:
 
 ```cpp
 #include <Arduino.h>
@@ -75,8 +75,8 @@ float speedRPM = 0.0; // current velocity
 
 // timer control
 // using unsigned long for millis() compatibility and overflow handling
-unsigned long prevMillisSpeed = 0;
-unsigned long interval = 10; // 10ms interval
+unsigned long prevMillisSpeed = 0; // previous timestamp for speed measurement
+unsigned long intervalTs = 10; // 10ms interval (sampling time)
 
 // NOTE: These steps are mandatory to use the SpeedEstimator class!
 // Implement your own method to read encoder pulses. This is just a simplified example.
@@ -118,7 +118,7 @@ void loop() {
         currentPulses = pos_i;
     }
     // Estimate speed at defined time interval (10ms)
-    if ((millis() - prevMillisSpeed) > interval) {
+    if ((millis() - prevMillisSpeed) > intervalTs) {
         speedRPM = speedEstimator.estimateSpeed(currentPulses);
         prevMillisSpeed = millis();
 
@@ -141,15 +141,32 @@ void readEncoderPulses()
 The result of the example is shown in the following figure (the blue line represents the variable speed in RPM):
 
 <p align="center">
-    <img src="images/speed_reading_serial_analyzer.png" width="700" alt="Speed reading result">
+    <img src="images/speed_reading_unfiltered_serial_analyzer.png" width="700" alt="Speed reading result">
 </p>
 
-### Diagram
+### Speed Estimation Block Diagram
 
 Refer to the following diagram for the wiring connections:
 
 <p align="center">
 <img src="images/speed_reading_connections.jpg" width="600" alt="Speed Reading Connections" />
+</p>
+
+### Filtering Block Diagram
+
+Below is a simple block diagram representing the speed estimation and filtering process:
+
+<p align="center">
+<img src="images/speed_estimation_logic.jpg" width="400" alt="Speed Reading Connections" />
+</p>
+
+This process ensures accurate and smooth speed estimation for motor control applications.
+
+
+Refer to the example file [SpeedReadingFiltered.cpp](examples/SpeedReadingFiltered.cpp), which uses the [DigitalFilter_dff](https://github.com/bulb-light/DigitalFilter_dff) library to filter the speed estimation signal. The result is shown in the following figure, where the blue line is the result of applying the EWMA low-pass filter, the red line is the moving average filter output, and the purple line is the unfiltered speed estimation:
+
+<p align="center">
+<img src="images/speed_reading_filtered.png" width="700" alt="Speed Reading Filtered" />
 </p>
 
 ### Note
@@ -158,11 +175,8 @@ Refer to the following diagram for the wiring connections:
 
 ## Important Notes
 
-- **Critical Note**: The library requires an external encoder counter to provide the `pulsesCount` parameter to the `estimateSpeed` function (as shown in the [block diagram](images/speed_reading_connections.svg)). If the `pulsesCount` remains constant, the library cannot estimate the speed, as it relies on changes in the pulse count over time to calculate velocity.
-- The `estimateSpeed` method includes a hardcoded filter for smoothing speed calculations. This may limit the library's effectiveness for high-speed motors or applications requiring rapid response times.
-- The hardcoded filter in `estimateSpeed` is designed for a sampling time of 0.01 seconds and implements a first-order Butterworth (IIR) filter. Adjustments may be required for different sampling times or filtering requirements.
+- **Critical Note**: The library requires an external encoder counter to provide the `pulsesCount` parameter to the `estimateSpeed` function (as shown in the [block diagram](images/speed_reading_connections.jpg)). If the `pulsesCount` remains constant, the library cannot estimate the speed, as it relies on changes in the pulse count over time to calculate velocity.
 - Ensure that the `estimateSpeed(int pulsesCount)` method is called at regular intervals to maintain accurate speed calculations.
-- Contributions to improve the library, such as making the filter configurable, are highly encouraged. Feel free to submit pull requests or open issues on the GitHub repository.
 
 ## Mathematical Background
 
@@ -180,27 +194,6 @@ The SpeedEstimator library calculates motor speed in RPM using encoder pulse dat
 3. **Speed in RPM**:
 
    $$\text{Speed (RPM)} = \omega \cdot \frac{60}{2\pi} \cdot \frac{1}{\text{Gear Ratio}}$$
-
-4. **Filtering**:
-   The library applies a first-order Butterworth filter to smooth the speed estimation:
-   
-   $$S_{filtered} = a \cdot S_{filtered,prev} + b \cdot S_{current} + c \cdot S_{prev}$$
-   
-   where:
-   - $a, b, c$: Filter coefficients
-   - $S_{filtered,prev}$: Previous filtered speed
-   - $S_{current}$: Current calculated speed
-   - $S_{prev}$: Previous calculated speed
-
-### Block Diagram
-
-Below is a simple block diagram representing the speed estimation and filtering process:
-
-<p align="center">
-<img src="images/speed_estimation_logic.jpg" width="400" alt="Speed Reading Connections" />
-</p>
-
-This process ensures accurate and smooth speed estimation for motor control applications.
 
 ## License
 

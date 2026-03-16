@@ -5,6 +5,9 @@
 #include <Arduino.h>
 #include <util/atomic.h>
 #include <SpeedEstimator.h>
+// Make sure you have the DigitalFilter_dff library available
+// in your project to use the filters in this example
+#include <DigitalFilter.h>
 
 // Motor control pins
 // Modify these pin definitions as per your wiring
@@ -24,11 +27,21 @@ SpeedEstimator speedEstimator(ppr, gearRatio);
 
 // globals speed measurement and control variables
 float speedRPM = 0.0; // current velocity
-
+float speedRPMFiltEWMA = 0.0; // filtered velocity with EWMA Low Pass Filter
+float speedRPMFiltMA = 0.0; // filtered velocity with Moving Average Filter
+ 
 // timer control
 // using unsigned long for millis() compatibility and overflow handling
 unsigned long prevMillisSpeed = 0; // previous timestamp for speed measurement
 unsigned long intervalTs = 10; // 10ms interval (sampling time)
+
+// Create a low pass EWMA filter and Moving Average filter for speed readings
+float cutoffFrequency = 8.0; // Cutoff frequency for EWMA Low Pass Filter (Hz)
+float samplingRate = 1.0 / ((float)intervalTs / 1000.0); // Sampling rate (Hz)
+DigitalFilter ewmaLowPassFilter(DigitalFilter::Type::EWMALowPass, cutoffFrequency, samplingRate);
+
+// 10-point Moving Average Filter
+DigitalFilter movingAverageFilter(DigitalFilter::Type::MovingAverage, 10);
 
 // NOTE: These steps are mandatory to use the SpeedEstimator class!
 // Implement your own method to read encoder pulses. This is just a simplified example.
@@ -72,12 +85,17 @@ void loop() {
     // Estimate speed at defined time interval (10ms)
     if ((millis() - prevMillisSpeed) > intervalTs) {
         speedRPM = speedEstimator.estimateSpeed(currentPulses);
+        // aply low pass filter to speed reading
+        speedRPMFiltEWMA = ewmaLowPassFilter.computeFilterOut(speedRPM);
+        speedRPMFiltMA = movingAverageFilter.computeFilterOut(speedRPM);
         prevMillisSpeed = millis();
 
         // Serial.print("Motor Speed: ");
-        Serial.print(speedRPM);
+        Serial.print(speedRPMFiltEWMA);
         Serial.print(" ");
-        Serial.println(0);
+        Serial.print(speedRPMFiltMA);
+        Serial.print(" ");
+        Serial.println(speedRPM);
         // Serial.println(" RPM");
     }
 }

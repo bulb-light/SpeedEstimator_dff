@@ -35,9 +35,6 @@ class SpeedEstimator {
     private:
         unsigned long mPrevTime; ///< Previous timestamp in microseconds.
         long mPrevNumPulses; ///< Previous number of pulses.
-        float mSpeedFilt; ///< Filtered velocity.
-        float mSpeedPrev; ///< Previous velocity.
-
         float mPpr; ///< Pulses per revolution of the encoder.
         float mGearRatio; ///< Gear ratio of the motor.
 

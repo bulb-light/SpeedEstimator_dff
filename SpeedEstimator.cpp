@@ -11,7 +11,7 @@
 #include <Arduino.h> // Include Arduino.h for micros() and other Arduino-specific functions
 
 SpeedEstimator::SpeedEstimator(float ppr, float gearRatio)
-    : mPrevTime(0), mPrevNumPulses(0), mSpeedFilt(0), mSpeedPrev(0), mPpr(ppr), mGearRatio(gearRatio) {}
+    : mPrevTime(0), mPrevNumPulses(0), mPpr(ppr), mGearRatio(gearRatio) {}
 
 SpeedEstimator::~SpeedEstimator()
 {
@@ -25,7 +25,7 @@ float SpeedEstimator::estimateSpeed(long pulsesCount) {
 
     if (deltaTime <= 0) {
         // Avoid division by zero or negative time intervals
-        return mSpeedFilt;
+        return 0.0f;
     }
 
     // Handle pulse counter overflow by calculating the signed difference
@@ -39,18 +39,13 @@ float SpeedEstimator::estimateSpeed(long pulsesCount) {
     // Convert counts/s to RPM (60 seconds per minute)
     velocity = (velocity / mPpr) * (1.0 / mGearRatio) * 60.0;
 
-    // Low-pass filter
-    // TODO: Tune filter coefficients as needed, or expand the
-    // class to allow user-defined coefficients
-    mSpeedFilt = 0.7265 * mSpeedFilt + 0.1367 * velocity + 0.1367 * mSpeedPrev;
-    mSpeedPrev = velocity;
-
-    return mSpeedFilt;
+    // NOTE: The velocity estimation can be noisy due to encoder resolution
+    // and timing variations. Consider applying a filter to the output
+    // to smooth the speed estimate
+    return velocity;
 }
 
 void SpeedEstimator::reset() {
     mPrevTime = 0;
     mPrevNumPulses = 0;
-    mSpeedFilt = 0;
-    mSpeedPrev = 0;
 }
