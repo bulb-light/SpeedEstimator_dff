@@ -9,7 +9,6 @@ Experimental library. Minimal tested, so usage remarks and comments are welcome.
 - Calculates motor speed in RPM based on encoder pulse readings.
 - Supports gear ratio adjustments.
 - Provides a reset functionality to clear internal states.
-- Lightweight and easy to integrate into Arduino projects.
 
 ## Installation
 
